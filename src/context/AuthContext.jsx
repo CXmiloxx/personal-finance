@@ -1,15 +1,16 @@
-/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from 'react';
 
-const AuthContext = createContext(undefined);
+const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('isAuthenticated') === 'true';
-    }
-    return false;
-  });
+const getInitialAuthState = () => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('isAuthenticated') === 'true';
+  }
+  return false;
+};
+
+export const AuthProvider = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(getInitialAuthState);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -17,46 +18,65 @@ export function AuthProvider({ children }) {
     }
   }, [isAuthenticated]);
 
-  const login = async ({ username, password }) => {
-    const response = await fetch(`${import.meta.env.VITE_URL_API}/limbs/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json', 
-      },
-      body: JSON.stringify({
-        email: username,
-        contraseña: password,
-      }),
-    }); 
+  const login = async ({ email, password }) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_URL_API}/limbs/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ correo: email, contraseña: password }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Error al iniciar sesión');
 
-    if (!response.ok) {
-      throw new Error(data.error || 'Error al iniciar sesión');
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('isAuthenticated', 'true');
+      setIsAuthenticated(true);
+
+      return data;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
     }
+  };
 
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('isAuthenticated', 'true');
-    setIsAuthenticated(true);
-    return data;
+  const signUp = async ({ username, email, password }) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_URL_API}/limbs/newUser`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre: username, correo: email, contraseña: password }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Error al registrarse');
+
+      setIsAuthenticated(true);
+      localStorage.setItem('isAuthenticated', 'true');
+      return data;
+    } catch (error) {
+      console.error('Signup error:', error);
+      throw error;
+    }
   };
 
   const logout = () => {
-    setIsAuthenticated(false);
+    localStorage.removeItem('token');
     localStorage.removeItem('isAuthenticated');
+    setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, signUp, logout }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
-export function useAuth() {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth debe ser usado dentro de un AuthProvider');
+    throw new Error('useAuth debe usarse dentro de un AuthProvider');
   }
   return context;
-}
+};
