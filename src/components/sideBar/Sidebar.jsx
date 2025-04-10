@@ -15,17 +15,14 @@ export default function Sidebar({ sideOpen, setSideOpen }) {
       transition={{ duration: 0.4, ease: 'easeInOut' }}
       className="h-screen bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text fixed left-0 top-0 shadow-2xl flex flex-col"
     >
-      <SidebarHeader
-        sideOpen={sideOpen} 
-        setSideOpen={setSideOpen} 
+      <SidebarHeader sideOpen={sideOpen} setSideOpen={setSideOpen} />
+
+      <SidebarNavigation
+        sideOpen={sideOpen}
+        optionsOpen={optionsOpen}
+        setOptionsOpen={setOptionsOpen}
       />
-      
-      <SidebarNavigation 
-        sideOpen={sideOpen} 
-        optionsOpen={optionsOpen} 
-        setOptionsOpen={setOptionsOpen} 
-      />
-      
+
       <SidebarFooter />
     </motion.div>
   );
