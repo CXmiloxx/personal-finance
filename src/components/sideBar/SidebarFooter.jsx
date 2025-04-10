@@ -9,14 +9,15 @@ const SidebarFooter = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
   };
+  
 
   return (
     <motion.footer
-      className="px-4 py-6 border-t bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 shadow-inner"
+      className="px-4 py-6 border-t bg-light-bg dark:bg-dark-bg text-gray-800 dark:text-dark-text shadow-inner"
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
