@@ -1,22 +1,28 @@
 import { FaHome, FaInfoCircle, FaConciergeBell, FaCog } from 'react-icons/fa';
-import LoginPage from '@/LoginPage';
-import HomePage from '$/HomePage/HomePage';
+import HomePage from '$/HomePage';
 import AboutPage from '$/AboutPage';
 import ServicesPage from '$/ServicesPage';
 import Option1Page from '$/Option1Page';
+import SignUp from '@/user-auth/SignUp';
+import Login from '@/user-auth/Login';
 
 export const publicRoutes = [
   {
-    name: 'Login',
+    name: 'SingUp',
     path: '/',
-    component: LoginPage,
-  }
+    component: SignUp,
+  },
+  {
+    name: 'Login',
+    path: '/login',
+    component: Login,
+  },
 ];
 
 export const protectedRoutes = [
   {
     name: 'Dashboard',
-    path: '/Dashboard',
+    path: '/dashboard',
     icon: FaHome,
     component: HomePage,
   },
@@ -37,5 +43,5 @@ export const protectedRoutes = [
     path: '/halloween2022',
     icon: FaCog,
     component: Option1Page,
-  }
+  },
 ];
