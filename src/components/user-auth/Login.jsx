@@ -46,7 +46,6 @@ export default function Login() {
         transition={{ duration: 0.6, ease: 'easeOut' }}
         className="bg-white dark:bg-gray-900 shadow-2xl rounded-3xl overflow-hidden max-w-4xl w-full flex flex-col md:flex-row"
       >
-        {/* Lado izquierdo: ilustración / branding */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
@@ -66,7 +65,6 @@ export default function Login() {
           </div>
         </motion.div>
 
-        {/* Lado derecho: formulario */}
         <div className="w-full md:w-1/2 p-10 space-y-6">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-gray-800 dark:text-white">
