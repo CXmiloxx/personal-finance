@@ -6,7 +6,7 @@ import { useAuth } from '#/AuthContext';
 import { Loader2 } from 'lucide-react';
 
 export default function SignUp() {
-  const { SignUp } = useAuth();
+  const { signUpUser } = useAuth();
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +28,7 @@ export default function SignUp() {
     setError('');
 
     try {
-      await SignUp(userData);
+      await signUpUser(userData);
       navigate('/login');
     } catch (err) {
       setError(err.message || 'Error al crear la cuenta');
@@ -74,9 +74,24 @@ export default function SignUp() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {[
-            { label: 'Nombre de usuario', name: 'username', type: 'text', icon: '👤' },
-            { label: 'Correo electrónico', name: 'email', type: 'email', icon: '📧' },
-            { label: 'Contraseña', name: 'password', type: 'password', icon: '🔒' },
+            {
+              label: 'Nombre de usuario',
+              name: 'username',
+              type: 'text',
+              icon: '👤',
+            },
+            {
+              label: 'Correo electrónico',
+              name: 'email',
+              type: 'email',
+              icon: '📧',
+            },
+            {
+              label: 'Contraseña',
+              name: 'password',
+              type: 'password',
+              icon: '🔒',
+            },
           ].map(({ label, name, type, icon }, i) => (
             <motion.div
               key={name}
