@@ -21,12 +21,12 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_URL_API}/auth/verify`, {
+        const response = await fetch(`${import.meta.env.VITE_URL_API}/limbs/auth/verify`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (response.ok) {
-          const data = await response.json();
+          const data = await response.json();          
           setUser(data.user);
           setIsAuthenticated(true);
         } else {
@@ -50,7 +50,6 @@ export const AuthProvider = ({ children }) => {
 
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Error al iniciar sesión');
-
     localStorage.setItem('token', data.token);
     localStorage.setItem('isAuthenticated', 'true');
     setIsAuthenticated(true);
@@ -67,6 +66,7 @@ export const AuthProvider = ({ children }) => {
     });
 
     const data = await response.json();
+    
     if (!response.ok) throw new Error(data.error || 'Error al registrarse');
 
     if (data.token) {
