@@ -4,11 +4,18 @@ import { motion } from 'framer-motion';
 import { protectedRoutes } from '@router/routes';
 import NavigationItem from './NavigationItem';
 
-const SidebarNavigation = ({ sideOpen}) => {
+const SidebarNavigation = ({ sideOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const allRoutes = [...protectedRoutes];
+  // Agrupar rutas por categoría
+  const routeGroups = {
+    main: protectedRoutes.filter((route) => ['Dashboard'].includes(route.name)),
+    features: protectedRoutes.filter((route) =>
+      ['Servicios', 'Halloween 2022'].includes(route.name),
+    ),
+    info: protectedRoutes.filter((route) => ['Nosotros'].includes(route.name)),
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -26,27 +33,64 @@ const SidebarNavigation = ({ sideOpen}) => {
   };
 
   return (
-    <motion.ul
-      className="mt-4 space-y-16 flex-1 overflow-hidden"
+    <motion.div
+      className="mt-4 flex-1 overflow-hidden px-2"
       variants={containerVariants}
       initial="hidden"
       animate="show"
     >
-      {allRoutes.map((item) => (
-        <motion.li
-          key={item.path}
-          className="flex items-center"
-          variants={itemVariants}
-        >
-          <NavigationItem
-            item={item}
-            onClick={() => navigate(item.path)}
-            isOpen={sideOpen}
-            isActive={location.pathname === item.path}
-          />
-        </motion.li>
-      ))}
-    </motion.ul>
+      {/* Grupo Principal */}
+      <motion.ul className="mb-8">
+        {routeGroups.main.map((item) => (
+          <motion.li key={item.path} variants={itemVariants}>
+            <NavigationItem
+              item={item}
+              onClick={() => navigate(item.path)}
+              isOpen={sideOpen}
+              isActive={location.pathname === item.path}
+            />
+          </motion.li>
+        ))}
+      </motion.ul>
+
+      {/* Grupo de Características */}
+      {sideOpen && (
+        <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 px-3">
+          Características
+        </div>
+      )}
+      <motion.ul className="mb-8 space-y-1">
+        {routeGroups.features.map((item) => (
+          <motion.li key={item.path} variants={itemVariants}>
+            <NavigationItem
+              item={item}
+              onClick={() => navigate(item.path)}
+              isOpen={sideOpen}
+              isActive={location.pathname === item.path}
+            />
+          </motion.li>
+        ))}
+      </motion.ul>
+
+      {/* Grupo de Información */}
+      {sideOpen && (
+        <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 px-3">
+          Información
+        </div>
+      )}
+      <motion.ul className="space-y-1">
+        {routeGroups.info.map((item) => (
+          <motion.li key={item.path} variants={itemVariants}>
+            <NavigationItem
+              item={item}
+              onClick={() => navigate(item.path)}
+              isOpen={sideOpen}
+              isActive={location.pathname === item.path}
+            />
+          </motion.li>
+        ))}
+      </motion.ul>
+    </motion.div>
   );
 };
 
