@@ -12,7 +12,7 @@ export default function SignUp() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [userData, setUserData] = useState({
-    username: '',
+    name: '',
     email: '',
     password: '',
   });
@@ -76,7 +76,7 @@ export default function SignUp() {
           {[
             {
               label: 'Nombre de usuario',
-              name: 'username',
+              name: 'name',
               type: 'text',
               icon: '👤',
             },

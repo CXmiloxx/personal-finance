@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
     const response = await fetch(`${import.meta.env.VITE_URL_API}/limbs/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ correo: email, contraseña: password }),
+      body: JSON.stringify({ userEmail: email, userPass: password }),
     });
 
     const data = await response.json();
@@ -58,11 +58,11 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  const signUpUser = async ({ username, email, password }) => {
+  const signUpUser = async ({ name, email, password }) => {
     const response = await fetch(`${import.meta.env.VITE_URL_API}/limbs/auth/newUser`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nombre: username, correo: email, contraseña: password }),
+      body: JSON.stringify({ userName: name, userEmail: email, userPass: password }),
     });
 
     const data = await response.json();
