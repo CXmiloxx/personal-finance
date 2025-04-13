@@ -1,10 +1,10 @@
 import { FaHome, FaInfoCircle, FaConciergeBell, FaCog } from 'react-icons/fa';
-import HomePage from '$/HomePage';
 import AboutPage from '$/AboutPage';
 import ServicesPage from '$/ServicesPage';
 import Option1Page from '$/Option1Page';
-import SignUp from '@/user-auth/SignUp';
-import Login from '@/user-auth/Login';
+import CategorysPage from '$/CategoriesPage/CategorysPage';
+import SignUp from '$/AuthPage/components/user-auth/SignUp';
+import Login from '$/AuthPage/components/user-auth/Login';
 
 export const publicRoutes = [
   {
@@ -21,10 +21,10 @@ export const publicRoutes = [
 
 export const protectedRoutes = [
   {
-    name: 'Dashboard',
-    path: '/dashboard',
+    name: 'Inicio',
+    path: '/categorias',
     icon: FaHome,
-    component: HomePage,
+    component: CategorysPage,
   },
   {
     name: 'Nosotros',

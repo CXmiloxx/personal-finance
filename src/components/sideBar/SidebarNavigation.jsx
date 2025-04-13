@@ -8,9 +8,8 @@ const SidebarNavigation = ({ sideOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Agrupar rutas por categoría
   const routeGroups = {
-    main: protectedRoutes.filter((route) => ['Dashboard'].includes(route.name)),
+    main: protectedRoutes.filter((route) => ['Inicio'].includes(route.name)),
     features: protectedRoutes.filter((route) =>
       ['Servicios', 'Halloween 2022'].includes(route.name),
     ),

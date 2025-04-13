@@ -2,8 +2,8 @@
 import { useAuth } from '#/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import ButtonTheme from '../ButtonTheme';
 import Logout from '@/Logout';
+import ButtonTheme from '@/ButtonTheme';
 
 const SidebarFooter = () => {
   const { logout } = useAuth();

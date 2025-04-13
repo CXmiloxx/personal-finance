@@ -30,7 +30,7 @@ export default function Login() {
 
     try {
       await login(userData);
-      navigate('/dashboard');
+      navigate('/categorias');
     } catch (err) {
       setError(err.message || 'Error al iniciar sesión');
     } finally {
