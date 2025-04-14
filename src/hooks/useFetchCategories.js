@@ -75,6 +75,76 @@ const useFetchCategories = () => {
     }
   };
 
+  const editCategory = async (categoryId, newCategoryName) => {
+    if (!idUser) {
+      setError('Usuario no autenticado');
+      return false;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`${API_URL}/categories/update`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: categoryId, name: newCategoryName}),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al editar la categoría');
+      }
+
+      await fetchCategories();
+      return true;
+    } catch (err) {
+      setError(err.message);
+      console.error('Error al editar categoría:', err);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteCategory = async (categoryId) => {
+    if (!idUser) {
+      setError('Usuario no autenticado');
+      return false;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`${API_URL}/categories/delete/${categoryId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ idUser, categoryId }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al eliminar la categoría');
+      }
+
+      await fetchCategories();
+      return true;
+    } catch (err) {
+      setError(err.message);
+      console.error('Error al eliminar categoría:', err);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (idUser) {
       fetchCategories();
@@ -87,6 +157,8 @@ const useFetchCategories = () => {
     error,
     fetchCategories,
     createCategory,
+    editCategory,
+    deleteCategory,
   };
 };
 
