@@ -7,6 +7,7 @@ import ListCategories from './components/ListCategories';
 import Modal from '@/Modal';
 import CreateCategory from './components/CreateCategory';
 import EditOrDeleteCategory from './components/EditOrDeleteCategory';
+import { useNavigate } from 'react-router-dom';
 
 export default function CategorysPage() {
   const {
@@ -20,6 +21,8 @@ export default function CategorysPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [nextPage, setNextPage] = useState(false);
+  const navigate = useNavigate();
 
   const handleOpenEditModal = (category) => {
     setSelectedCategory(category);
@@ -73,6 +76,10 @@ export default function CategorysPage() {
     return await createCategory(categoryName);
   };
 
+  const handleNextPage = () => {
+      navigate('/about');
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
@@ -110,6 +117,17 @@ export default function CategorysPage() {
           </Modal>
         )}
       </AnimatePresence>
+
+      {categories.length > 1 && !loading && (
+        <div className="flex justify-center mt-6">
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+            onClick={handleNextPage}
+          >
+            Siguiente Página
+          </button>
+        </div>
+      )}
     </div>
   );
 }
