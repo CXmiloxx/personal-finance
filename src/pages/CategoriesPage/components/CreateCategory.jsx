@@ -1,24 +1,41 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Save, Loader } from 'lucide-react';
 
-export default function CreateCategory({ createCategory }) {
+export default function CreateCategory({ createCategory, onSuccess }) {
   const [categoryName, setCategoryName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [validationMessage, setValidationMessage] = useState('');
 
   const handleChangeInput = (e) => {
     setCategoryName(e.target.value);
+    // Limpia los mensajes de error al escribir
+    if (validationMessage) setValidationMessage('');
+    if (error) setError(null);
   };
 
   const handleCreateCategory = async (e) => {
     e.preventDefault();
     
-    if (categoryName.trim() === '') return;
+    // Validación básica
+    if (categoryName.trim() === '') {
+      setValidationMessage('El nombre de categoría no puede estar vacío');
+      return;
+    }
     
     setLoading(true);
+    setError(null);
+    setValidationMessage('');
+    
     try {
       const success = await createCategory(categoryName);
       if (success) {
         setCategoryName('');
+        if (onSuccess) onSuccess();
+      } else {
+        setValidationMessage('No se pudo crear la categoría');
       }
     } catch (err) {
       setError(err.message);
@@ -28,25 +45,35 @@ export default function CreateCategory({ createCategory }) {
   };
 
   return (
-    <div className="dark:text-dark-text flex flex-col items-center justify-center p-6 bg-gray-100 dark:bg-gray-900 rounded-lg shadow-md mb-8">
-      <h1 className="text-2xl font-bold mb-6">Crear Categoría</h1>
-
-      {loading && (
-        <div className="text-blue-600 dark:text-blue-400 mb-4">
-          Creando categoría...
-        </div>
-      )}
-
+    <motion.div 
+      className="w-full"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+    >
       {error && (
-        <div className="text-red-600 dark:text-red-400 mb-4 p-3 bg-red-100 dark:bg-red-900/50 rounded-md">
+        <motion.div 
+          className="text-red-600 dark:text-red-400 mb-4 p-3 bg-red-100 dark:bg-red-900/50 rounded-md"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          transition={{ duration: 0.3 }}
+        >
           {error}
-        </div>
+        </motion.div>
       )}
 
-      <form
-        onSubmit={handleCreateCategory}
-        className="bg-white dark:bg-gray-800 shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-md"
-      >
+      {validationMessage && (
+        <motion.div 
+          className="text-amber-600 dark:text-amber-400 mb-4 p-3 bg-amber-100 dark:bg-amber-900/50 rounded-md"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          transition={{ duration: 0.3 }}
+        >
+          {validationMessage}
+        </motion.div>
+      )}
+
+      <form onSubmit={handleCreateCategory}>
         <div className="mb-4">
           <label
             className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
@@ -54,7 +81,8 @@ export default function CreateCategory({ createCategory }) {
           >
             Nombre de la Categoría
           </label>
-          <input
+          <motion.input
+            whileFocus={{ scale: 1.01, boxShadow: "0 0 0 2px rgba(59, 130, 246, 0.3)" }}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
             type="text"
             placeholder="Nombre de la categoría"
@@ -66,19 +94,32 @@ export default function CreateCategory({ createCategory }) {
           />
         </div>
 
-        <div className="flex items-center justify-between">
-          <button
+        <div className="flex justify-end">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             className={`
               ${loading ? 'bg-blue-300 dark:bg-blue-800 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600'} 
               text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors
+              flex items-center gap-2
             `}
             type="submit"
             disabled={loading}
           >
-            {loading ? 'Creando...' : 'Crear Categoría'}
-          </button>
+            {loading ? (
+              <>
+                <Loader size={16} className="animate-spin" />
+                <span>Creando...</span>
+              </>
+            ) : (
+              <>
+                <Save size={16} />
+                <span>Guardar</span>
+              </>
+            )}
+          </motion.button>
         </div>
       </form>
-    </div>
+    </motion.div>
   );
 }
