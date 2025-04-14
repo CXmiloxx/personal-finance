@@ -11,6 +11,9 @@ export const AuthProvider = ({ children }) => {
   });
 
   const [user, setUser] = useState(null);
+  const [isFirstLogin, setIsFirstLogin] = useState(() => {
+    return localStorage.getItem('isFirstLogin') === 'true'; // Verificar si es el primer login
+  });
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -21,14 +24,23 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_URL_API}/limbs/auth/verify`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_URL_API}/limbs/auth/verify`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
 
         if (response.ok) {
-          const data = await response.json();          
+          const data = await response.json();
           setUser(data.user);
           setIsAuthenticated(true);
+
+          // Si es el primer login, guardamos en localStorage
+          if (!localStorage.getItem('isFirstLogin')) {
+            localStorage.setItem('isFirstLogin', 'true');
+            setIsFirstLogin(true);
+          }
         } else {
           logout();
         }
@@ -42,11 +54,14 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async ({ email, password }) => {
-    const response = await fetch(`${import.meta.env.VITE_URL_API}/limbs/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userEmail: email, userPass: password }),
-    });
+    const response = await fetch(
+      `${import.meta.env.VITE_URL_API}/limbs/auth/login`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userEmail: email, userPass: password }),
+      },
+    );
 
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Error al iniciar sesión');
@@ -55,18 +70,30 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(true);
     setUser(data.user);
 
+    // Si es la primera vez, marcamos en el localStorage
+    if (!localStorage.getItem('isFirstLogin')) {
+      localStorage.setItem('isFirstLogin', 'true');
+      setIsFirstLogin(true);
+    }
+
     return data;
   };
 
   const signUpUser = async ({ name, email, password }) => {
-    const response = await fetch(`${import.meta.env.VITE_URL_API}/limbs/auth/newUser`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userName: name, userEmail: email, userPass: password }),
-    });
+    const response = await fetch(
+      `${import.meta.env.VITE_URL_API}/limbs/auth/newUser`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userName: name,
+          userEmail: email,
+          userPass: password,
+        }),
+      },
+    );
 
     const data = await response.json();
-    
     if (!response.ok) throw new Error(data.error || 'Error al registrarse');
 
     if (data.token) {
@@ -74,6 +101,12 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('isAuthenticated', 'true');
       setIsAuthenticated(true);
       setUser(data.user);
+
+      // Si es la primera vez, marcamos en el localStorage
+      if (!localStorage.getItem('isFirstLogin')) {
+        localStorage.setItem('isFirstLogin', 'true');
+        setIsFirstLogin(true);
+      }
     }
 
     return data;
@@ -84,20 +117,22 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('isAuthenticated');
     setIsAuthenticated(false);
     setUser(null);
+    setIsFirstLogin(false);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, signUpUser, logout }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, user, login, signUpUser, logout, isFirstLogin }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const useAuth = () => { 
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-}
+};

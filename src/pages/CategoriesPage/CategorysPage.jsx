@@ -8,6 +8,8 @@ import Modal from '@/Modal';
 import CreateCategory from './components/CreateCategory';
 import EditOrDeleteCategory from './components/EditOrDeleteCategory';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useAuth } from '#/AuthContext';
 
 export default function CategorysPage() {
   const {
@@ -23,6 +25,14 @@ export default function CategorysPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [nextPage, setNextPage] = useState(false);
   const navigate = useNavigate();
+  const { isFirstLogin } = useAuth();
+
+  useEffect(() => {
+    if (!isFirstLogin) {
+      navigate('/about'); // Redirige si es el primer login ✅
+    }
+  }, [isFirstLogin, navigate]);
+  
 
   const handleOpenEditModal = (category) => {
     setSelectedCategory(category);
@@ -77,7 +87,7 @@ export default function CategorysPage() {
   };
 
   const handleNextPage = () => {
-      navigate('/about');
+    navigate('/about');
   };
 
   return (
