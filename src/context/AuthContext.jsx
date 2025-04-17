@@ -3,16 +3,17 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('isAuthenticated') === 'true';
     }
     return false;
   });
-
   const [user, setUser] = useState(null);
   const [isFirstLogin, setIsFirstLogin] = useState(() => {
-    return localStorage.getItem('isFirstLogin') === 'true'; // Verificar si es el primer login
+    return localStorage.getItem('isFirstLogin') === 'true';
   });
 
   useEffect(() => {
@@ -20,10 +21,12 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem('token');
       if (!token) {
         setIsAuthenticated(false);
+        setLoading(false);
         return;
       }
 
       try {
+        setLoading(true);
         const response = await fetch(
           `${import.meta.env.VITE_URL_API}/limbs/auth/verify`,
           {
@@ -36,7 +39,6 @@ export const AuthProvider = ({ children }) => {
           setUser(data.user);
           setIsAuthenticated(true);
 
-          // Si es el primer login, guardamos en localStorage
           if (!localStorage.getItem('isFirstLogin')) {
             localStorage.setItem('isFirstLogin', 'true');
             setIsFirstLogin(true);
@@ -46,7 +48,10 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (error) {
         console.error('Error verificando autenticación:', error);
+        setError(error.message);
         logout();
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -54,62 +59,82 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async ({ email, password }) => {
-    const response = await fetch(
-      `${import.meta.env.VITE_URL_API}/limbs/auth/login`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userEmail: email, userPass: password }),
-      },
-    );
+    setLoading(true);
+    setError(null);
 
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Error al iniciar sesión');
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('isAuthenticated', 'true');
-    setIsAuthenticated(true);
-    setUser(data.user);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_URL_API}/limbs/auth/login`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userEmail: email, userPass: password }),
+        },
+      );
 
-    // Si es la primera vez, marcamos en el localStorage
-    if (!localStorage.getItem('isFirstLogin')) {
-      localStorage.setItem('isFirstLogin', 'true');
-      setIsFirstLogin(true);
-    }
+      const data = await response.json();
+      if (!response.ok)
+        throw new Error(data.error || 'Error al iniciar sesión');
 
-    return data;
-  };
-
-  const signUpUser = async ({ name, email, password }) => {
-    const response = await fetch(
-      `${import.meta.env.VITE_URL_API}/limbs/auth/newUser`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userName: name,
-          userEmail: email,
-          userPass: password,
-        }),
-      },
-    );
-
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Error al registrarse');
-
-    if (data.token) {
       localStorage.setItem('token', data.token);
       localStorage.setItem('isAuthenticated', 'true');
       setIsAuthenticated(true);
       setUser(data.user);
 
-      // Si es la primera vez, marcamos en el localStorage
       if (!localStorage.getItem('isFirstLogin')) {
         localStorage.setItem('isFirstLogin', 'true');
         setIsFirstLogin(true);
       }
-    }
 
-    return data;
+      return data;
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signUpUser = async ({ name, email, password }) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_URL_API}/limbs/auth/newUser`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userName: name,
+            userEmail: email,
+            userPass: password,
+          }),
+        },
+      );
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Error al registrarse');
+
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('isAuthenticated', 'true');
+        setIsAuthenticated(true);
+        setUser(data.user);
+
+        if (!localStorage.getItem('isFirstLogin')) {
+          localStorage.setItem('isFirstLogin', 'true');
+          setIsFirstLogin(true);
+        }
+      }
+
+      return data;
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   };
 
   const logout = () => {
@@ -120,9 +145,72 @@ export const AuthProvider = ({ children }) => {
     setIsFirstLogin(false);
   };
 
+  const resetPassword = async (email) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_URL_API}/limbs/auth/resetPassword`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email }),
+        },
+      );
+
+      const data = await response.json();
+      if (!response.ok)
+        throw new Error(data.error || 'Error al restablecer la contraseña');
+      return data;
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const newPassword = async (password, idUser) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_URL_API}/limbs/auth/newPassword`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: password, idUser: idUser }),
+        },
+      );
+
+      const data = await response.json();
+      if (!response.ok)
+        throw new Error(data.error || 'Error al restablecer la contraseña');
+      return data;
+    } catch (error) {
+      setError(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, user, login, signUpUser, logout, isFirstLogin }}
+      value={{
+        isAuthenticated,
+        user,
+        login,
+        signUpUser,
+        logout,
+        isFirstLogin,
+        resetPassword,
+        newPassword,
+        loading,
+        error,
+      }}
     >
       {children}
     </AuthContext.Provider>
