@@ -171,7 +171,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const newPassword = async (password, idUser) => {
+  const newPassword = async (token, password) => {
     setLoading(true);
     setError(null);
 
@@ -181,7 +181,7 @@ export const AuthProvider = ({ children }) => {
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password: password, idUser: idUser }),
+          body: JSON.stringify({ token: token, newPassword: password }),
         },
       );
 

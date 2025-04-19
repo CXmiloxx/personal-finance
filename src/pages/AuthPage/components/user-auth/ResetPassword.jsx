@@ -1,11 +1,13 @@
 import { useAuth } from '#/AuthContext';
 import React from 'react';
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 
 export default function ResetPassword() {
   const [email, setEmail] = React.useState('');
-  const { resetPassword, error, loading, } = useAuth(); // ← Ya estamos usando loading y error
+  const { resetPassword, error, loading, } = useAuth();
 
+  const navigate = useNavigate();
   const handleInputChange = (e) => {
     setEmail(e.target.value);
   };
@@ -31,6 +33,11 @@ export default function ResetPassword() {
         text: 'Revisa tu correo para restablecer tu contraseña.',
         confirmButtonText: 'Aceptar',
       });
+
+      setEmail('');
+      navigate('/login');
+
+
     } catch (error) {
       Swal.fire({
         icon: 'error',

@@ -1,35 +1,76 @@
 import { useAuth } from '#/AuthContext';
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 
 export default function NewPassword() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [strength, setStrength] = useState(0);
+  const [strengthLabel, setStrengthLabel] = useState('');
   const { newPassword, loading, error } = useAuth();
-  const { idUser } = useParams();
+  const { token } = useParams();
+  const navigate = useNavigate();
+
+  const validateStrength = (pwd) => {
+    let score = 0;
+
+    if (pwd.length >= 6) score++;
+    if (/[A-Za-z]/.test(pwd)) score++;
+    if (/\d/.test(pwd)) score++;
+    if (/[^A-Za-z0-9]/.test(pwd)) score++; // símbolo especial
+
+    switch (score) {
+      case 0:
+      case 1:
+        setStrength(25);
+        setStrengthLabel('Débil');
+        break;
+      case 2:
+        setStrength(50);
+        setStrengthLabel('Media');
+        break;
+      case 3:
+        setStrength(75);
+        setStrengthLabel('Buena');
+        break;
+      case 4:
+        setStrength(100);
+        setStrengthLabel('Fuerte');
+        break;
+      default:
+        setStrength(0);
+        setStrengthLabel('');
+    }
+  };
+
+  const isPasswordValid = (pwd) =>
+    pwd.length >= 6 && /[A-Za-z]/.test(pwd) && /\d/.test(pwd);
 
   const handleChange = async (e) => {
-    
     e.preventDefault();
-    if (!password) {
+
+    if (!isPasswordValid(password)) {
       return Swal.fire({
         icon: 'warning',
-        title: 'Contraseña requerida',
-        text: 'Por favor ingresa tu nueva contraseña.',
+        title: 'Contraseña inválida',
+        text: 'Debe tener al menos 6 caracteres, una letra y un número.',
         confirmButtonText: 'Aceptar',
       });
     }
 
     try {
-      await newPassword(password, idUser);
+      await newPassword(token, password);
       Swal.fire({
         icon: 'success',
         title: 'Contraseña Restablecida',
         text: 'Tu contraseña ha sido restablecida con éxito.',
         confirmButtonText: 'Aceptar',
       });
+
+      setPassword('');
+      navigate('/login');
     } catch (error) {
       Swal.fire({
         icon: 'error',
@@ -37,7 +78,6 @@ export default function NewPassword() {
         text: error.message || 'No se pudo restablecer la contraseña.',
         confirmButtonText: 'Aceptar',
       });
-      console.error(error);
     }
   };
 
@@ -60,7 +100,10 @@ export default function NewPassword() {
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  validateStrength(e.target.value);
+                }}
                 placeholder="********"
                 className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"
               />
@@ -71,6 +114,23 @@ export default function NewPassword() {
               >
                 {showPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
               </button>
+            </div>
+
+            {/* Barra de fuerza */}
+            <div className="mt-2">
+              <div className="w-full h-2 bg-gray-300 rounded-full overflow-hidden">
+                <div
+                  className={`h-full transition-all duration-300 ${
+                    strength >= 75
+                      ? 'bg-green-500'
+                      : strength >= 50
+                      ? 'bg-yellow-500'
+                      : 'bg-red-500'
+                  }`}
+                  style={{ width: `${strength}%` }}
+                ></div>
+              </div>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{strengthLabel}</p>
             </div>
           </div>
 
