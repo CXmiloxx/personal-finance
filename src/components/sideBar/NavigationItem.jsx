@@ -36,7 +36,7 @@ const NavigationItem = ({ item, onClick, isActive }) => {
               'text-sm truncate',
               isActive
                 ? 'font-semibold text-white'
-                : 'text-gray-200 group-hover:font-medium',
+                : 'text-black dark:text-dark-text group-hover:font-medium',
             )}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
