@@ -1,6 +1,6 @@
 import React from 'react';
 import Layout from '@layout/Layout';
-import Dashboard from '@/DashBoard/DashBoard';
+import Dashboard from './components/DashBoard/DashBoard';
 
 export default function HomePage() {
   return (
