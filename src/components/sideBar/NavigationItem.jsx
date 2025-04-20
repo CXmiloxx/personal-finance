@@ -2,8 +2,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FaChevronRight } from 'react-icons/fa';
+import { useSidebarState } from '!/useSidebar';
 
-const NavigationItem = ({ item, onClick, isOpen, isActive }) => {
+const NavigationItem = ({ item, onClick, isActive }) => {
+  const { isOpen } = useSidebarState();
   return (
     <motion.button
       onClick={onClick}

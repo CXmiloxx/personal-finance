@@ -5,10 +5,12 @@ import { useAuth } from '#/AuthContext';
 import logo from '/logo.png';
 import logoDark from '/logo-dark.png';
 import { useTheme } from '#/ThemeContext';
+import { useSidebarState } from '!/useSidebar';
 
-const SidebarHeader = ({ sideOpen, setSideOpen }) => {
+const SidebarHeader = () => {
   const { theme } = useTheme();
   const { user } = useAuth();
+  const {isOpen, setIsOpen } = useSidebarState();
 
   return (
     <motion.div
@@ -26,7 +28,7 @@ const SidebarHeader = ({ sideOpen, setSideOpen }) => {
             whileHover={{ scale: 1.1 }}
             transition={{ type: 'spring', stiffness: 400, damping: 10 }}
           />
-          {sideOpen && (
+          {isOpen && (
             <motion.h1
               className="text-lg font-semibold text-gray-800 dark:text-white"
               initial={{ opacity: 0, x: -20 }}
@@ -39,14 +41,14 @@ const SidebarHeader = ({ sideOpen, setSideOpen }) => {
         </motion.div>
 
         <motion.button
-          onClick={() => setSideOpen(!sideOpen)}
+          onClick={() => setIsOpen(!isOpen)}
           className="rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300
             focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
           <motion.div
-            animate={{ rotate: sideOpen ? 0 : 180 }}
+            animate={{ rotate: isOpen ? 0 : 180 }}
             transition={{ duration: 0.3 }}
           >
             <FaChevronLeft />
@@ -54,7 +56,7 @@ const SidebarHeader = ({ sideOpen, setSideOpen }) => {
         </motion.button>
       </div>
 
-      {sideOpen && user && (
+      {isOpen && user && (
         <motion.div
           className="flex items-center gap-3 px-2"
           initial={{ opacity: 0, y: -10 }}

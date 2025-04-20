@@ -3,18 +3,12 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { protectedRoutes } from '@router/routes';
 import NavigationItem from './NavigationItem';
+import SidebarFooter from './SidebarFooter';
 
-const SidebarNavigation = ({ sideOpen }) => {
+const SidebarNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const routeGroups = {
-    main: protectedRoutes.filter((route) => ['Inicio'].includes(route.name)),
-    features: protectedRoutes.filter((route) =>
-      ['Servicios', 'Halloween 2022'].includes(route.name),
-    ),
-    info: protectedRoutes.filter((route) => ['Nosotros'].includes(route.name)),
-  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -38,56 +32,17 @@ const SidebarNavigation = ({ sideOpen }) => {
       initial="hidden"
       animate="show"
     >
-      {/* Grupo Principal */}
       <motion.ul className="mb-8">
-        {routeGroups.main.map((item) => (
+        {protectedRoutes.map((item) => (
           <motion.li key={item.path} variants={itemVariants}>
             <NavigationItem
               item={item}
               onClick={() => navigate(item.path)}
-              isOpen={sideOpen}
               isActive={location.pathname === item.path}
             />
           </motion.li>
         ))}
-      </motion.ul>
-
-      {/* Grupo de Características */}
-      {sideOpen && (
-        <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 px-3">
-          Características
-        </div>
-      )}
-      <motion.ul className="mb-8 space-y-1">
-        {routeGroups.features.map((item) => (
-          <motion.li key={item.path} variants={itemVariants}>
-            <NavigationItem
-              item={item}
-              onClick={() => navigate(item.path)}
-              isOpen={sideOpen}
-              isActive={location.pathname === item.path}
-            />
-          </motion.li>
-        ))}
-      </motion.ul>
-
-      {/* Grupo de Información */}
-      {sideOpen && (
-        <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 px-3">
-          Información
-        </div>
-      )}
-      <motion.ul className="space-y-1">
-        {routeGroups.info.map((item) => (
-          <motion.li key={item.path} variants={itemVariants}>
-            <NavigationItem
-              item={item}
-              onClick={() => navigate(item.path)}
-              isOpen={sideOpen}
-              isActive={location.pathname === item.path}
-            />
-          </motion.li>
-        ))}
+        <SidebarFooter/>
       </motion.ul>
     </motion.div>
   );

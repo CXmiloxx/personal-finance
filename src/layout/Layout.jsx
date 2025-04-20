@@ -1,20 +1,18 @@
 /* eslint-disable no-unused-vars */
 import Sidebar from '@/sideBar/Sidebar';
-import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useSidebarState } from '!/useSidebar';
 
 export default function Layout({ children }) {
-  const [open, setOpen] = useState(false);
+  const {isOpen} = useSidebarState();
 
   return (
     <div className="flex">
-      {/* Sidebar */}
-      <Sidebar sideOpen={open} setSideOpen={setOpen} />
+      <Sidebar />
 
-      {/* Contenido que se mueve suavemente */}
       <motion.div
         initial={{ marginLeft: 60 }}
-        animate={{ marginLeft: open ? 240 : 60 }}
+        animate={{ marginLeft: isOpen ? 240 : 60 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         className="flex-1 p-4 transition-all"
       >
