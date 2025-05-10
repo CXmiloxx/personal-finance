@@ -3,7 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 
-export default function Modal({ handleCloseModal, children }) {
+export default function Modal({ handleCloseModal, children, title }) {
   return (
     <motion.div
       className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
@@ -25,7 +25,7 @@ export default function Modal({ handleCloseModal, children }) {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
           >
-            Crear Nueva Categoría
+            {title}
           </motion.h2>
           <motion.button
             whileHover={{ scale: 1.1, rotate: 90 }}
