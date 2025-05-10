@@ -1,5 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import { AlertTriangle } from 'lucide-react';
 
@@ -9,7 +10,7 @@ export default function CustomForm({
   onSubmit,
   fields,
   defaultValues = {},
-  submitLabel = "Enviar"
+  submitLabel = 'Enviar',
 }) {
   const {
     register,
@@ -17,7 +18,7 @@ export default function CustomForm({
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
-    defaultValues
+    defaultValues,
   });
 
   return (
@@ -35,21 +36,54 @@ export default function CustomForm({
         </h2>
       </div>
 
-      {fields.map(({ name, label, type = "text", placeholder }) => (
+      {fields.map(({ name, label, type = 'text', placeholder, options }) => (
         <div key={name} className="space-y-1">
           <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
             {label}
           </label>
-          <input
-            type={type}
-            placeholder={placeholder}
-            {...register(name)}
-            className={`w-full px-4 py-3 rounded-xl border transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 ${
-              errors[name]
-                ? 'border-red-500'
-                : 'border-gray-300 dark:border-gray-600'
-            }`}
-          />
+          {type === 'text' && (
+            <input
+              type={type}
+              placeholder={placeholder}
+              {...register(name)}
+              className={`w-full px-4 py-3 rounded-xl border transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 ${
+                errors[name]
+                  ? 'border-red-500'
+                  : 'border-gray-300 dark:border-gray-600'
+              }`}
+            />
+          )}
+          {type === 'select' && options && (
+            <select
+              {...register(name)}
+              className={`w-full px-4 py-3 rounded-xl border transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 ${
+                errors[name]
+                  ? 'border-red-500'
+                  : 'border-gray-300 dark:border-gray-600'
+              }`}
+            >
+              <option value="" disabled>
+                {placeholder}
+              </option>
+              {options.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          )}
+          {type === 'checkbox' && (
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                {...register(name)}
+                className="w-4 h-4 text-indigo-600 border-gray-300 rounded"
+              />
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                {label}
+              </span>
+            </div>
+          )}
           {errors[name] && (
             <p className="flex items-center text-sm text-red-600 mt-1">
               <AlertTriangle className="w-4 h-4 mr-1" />
