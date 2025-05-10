@@ -22,7 +22,7 @@ export default function Login() {
     e.preventDefault();
     try {
       await login(userData);
-      navigate('/categorias');
+      navigate('/dashboard');
     } catch (err) {
       console.error('Error al iniciar sesión:', err);
       setUserData({ email: '', password: '' });
