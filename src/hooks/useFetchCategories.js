@@ -63,7 +63,6 @@ const useFetchCategories = () => {
         throw new Error(data.error || 'Error al crear la categoría');
       }
 
-      // Actualizar la lista de categorías después de crear una nueva
       await fetchCategories();
       return true;
     } catch (err) {
@@ -90,7 +89,11 @@ const useFetchCategories = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id: categoryId, name: newCategoryName}),
+        body: JSON.stringify({
+          id: categoryId,
+          name: newCategoryName,
+          userId: idUser,
+        }),
       });
 
       const data = await response.json();
@@ -120,22 +123,26 @@ const useFetchCategories = () => {
     setError(null);
 
     try {
-      const response = await fetch(`${API_URL}/categories/delete/${categoryId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${API_URL}/categories/delete/${categoryId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ idUser, categoryId }),
         },
-        body: JSON.stringify({ idUser, categoryId }),
-      });
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.error || 'Error al eliminar la categoría');
       }
-
-      await fetchCategories();
-      return true;
+      if (data) {
+        await fetchCategories();
+        return true;
+      }
     } catch (err) {
       setError(err.message);
       console.error('Error al eliminar categoría:', err);
