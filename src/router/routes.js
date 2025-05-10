@@ -1,4 +1,9 @@
-import { FaHome, FaInfoCircle, FaConciergeBell, FaCog } from 'react-icons/fa';
+import {
+  FaDollarSign,
+  FaList,
+  FaPlusCircle,
+  FaTachometerAlt,
+} from 'react-icons/fa';
 import AboutPage from '$/AboutPage';
 import ServicesPage from '$/ServicesPage';
 import SignUp from '$/AuthPage/components/user-auth/SignUp';
@@ -6,6 +11,9 @@ import Login from '$/AuthPage/components/user-auth/Login';
 import ResetPassword from '$/AuthPage/components/user-auth/ResetPassword';
 import NewPassword from '$/AuthPage/components/user-auth/NewPassword';
 import HomePage from '$/HomePage/HomePage';
+import expensesIncomePage from '$/expensesIncomePage/expensesIncomePage';
+import CategoriesPage from '$/categoriesPage/categoriesPage';
+import CreateCategoriesPage from '$/createCategories/CreateCategoriesPage';
 
 export const publicRoutes = [
   {
@@ -32,27 +40,27 @@ export const publicRoutes = [
 
 export const protectedRoutes = [
   {
-    name: 'Inicio',
-    path: '/categorias',
-    icon: FaHome,
-    component: HomePage,
+    name: 'Gastos y Ingresos',
+    path: '/expenses-income',
+    icon: FaDollarSign,
+    component: expensesIncomePage,
   },
   {
-    name: 'Nosotros',
-    path: '/about',
-    icon: FaInfoCircle,
-    component: AboutPage,
+    name: 'Mis Categorías',
+    path: '/categories',
+    icon: FaList,
+    component: CategoriesPage,
   },
   {
-    name: 'Servicios',
-    path: '/services',
-    icon: FaConciergeBell,
-    component: ServicesPage,
+    name: 'Crear Categorías',
+    path: '/create-categories',
+    icon: FaPlusCircle,
+    component: CreateCategoriesPage,
   },
   {
     name: 'DashBoard',
     path: '/dashboard',
-    icon: FaCog,
+    icon: FaTachometerAlt,
     component: HomePage,
   },
 ];
