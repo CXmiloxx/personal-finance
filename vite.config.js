@@ -11,15 +11,17 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src/components'),
-      '$': path.resolve(__dirname, './src/pages'),
+      $: path.resolve(__dirname, './src/pages'),
       '@layout': path.resolve(__dirname, './src/layout'),
       '@router': path.resolve(__dirname, './src/router'),
       '#': path.resolve(__dirname, './src/context'),
       '?': path.resolve(__dirname, './src/utils'),
       '!': path.resolve(__dirname, './src/hooks'),
+      'helpers': path.resolve(__dirname, './src/helpers'),
+      'icons': path.resolve(__dirname, './src/icons'),
     },
   },
-  build:{
+  build: {
     outDir: 'personal-finance',
-  }
+  },
 });

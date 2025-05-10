@@ -9,6 +9,9 @@
       "@layout/*": ["./src/layout/*"],
       "@router/*": ["src/router/*"],
       "!/*": ["./src/hooks/*"],
+      "helpers/*": ["./src/helpers/*"],
+      "icons/*": ["./src/icons/*"],
+
 
     }
   },
