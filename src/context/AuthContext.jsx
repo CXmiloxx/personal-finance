@@ -12,9 +12,6 @@ export const AuthProvider = ({ children }) => {
     return false;
   });
   const [user, setUser] = useState(null);
-  const [isFirstLogin, setIsFirstLogin] = useState(() => {
-    return localStorage.getItem('isFirstLogin') === 'true';
-  });
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -41,7 +38,6 @@ export const AuthProvider = ({ children }) => {
 
           if (!localStorage.getItem('isFirstLogin')) {
             localStorage.setItem('isFirstLogin', 'true');
-            setIsFirstLogin(true);
           }
         } else {
           logout();
@@ -83,7 +79,6 @@ export const AuthProvider = ({ children }) => {
 
       if (!localStorage.getItem('isFirstLogin')) {
         localStorage.setItem('isFirstLogin', 'true');
-        setIsFirstLogin(true);
       }
 
       return data;
@@ -124,7 +119,6 @@ export const AuthProvider = ({ children }) => {
 
         if (!localStorage.getItem('isFirstLogin')) {
           localStorage.setItem('isFirstLogin', 'true');
-          setIsFirstLogin(true);
         }
       }
 
@@ -142,7 +136,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('isAuthenticated');
     setIsAuthenticated(false);
     setUser(null);
-    setIsFirstLogin(false);
   };
 
   const resetPassword = async (email) => {
@@ -205,7 +198,6 @@ export const AuthProvider = ({ children }) => {
         login,
         signUpUser,
         logout,
-        isFirstLogin,
         resetPassword,
         newPassword,
         loading,

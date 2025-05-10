@@ -1,7 +1,6 @@
 import { FaHome, FaInfoCircle, FaConciergeBell, FaCog } from 'react-icons/fa';
 import AboutPage from '$/AboutPage';
 import ServicesPage from '$/ServicesPage';
-import CategorysPage from '$/CategoriesPage/CategorysPage';
 import SignUp from '$/AuthPage/components/user-auth/SignUp';
 import Login from '$/AuthPage/components/user-auth/Login';
 import ResetPassword from '$/AuthPage/components/user-auth/ResetPassword';
@@ -22,13 +21,13 @@ export const publicRoutes = [
   {
     name: 'Reset Password',
     path: '/reset-password',
-    component: ResetPassword ,
+    component: ResetPassword,
   },
   {
     name: 'Nueva Contraseña',
     path: '/new-password/:token',
     component: NewPassword,
-  }
+  },
 ];
 
 export const protectedRoutes = [
@@ -36,7 +35,7 @@ export const protectedRoutes = [
     name: 'Inicio',
     path: '/categorias',
     icon: FaHome,
-    component: CategorysPage,
+    component: HomePage,
   },
   {
     name: 'Nosotros',
