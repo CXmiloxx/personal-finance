@@ -3,6 +3,7 @@ import { useState, useCallback, useMemo } from 'react';
 export const useFetch = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const API_URL = import.meta.env.VITE_URL_API;
 
   // Memoriza el token para evitar acceder a localStorage cada vez
   const token = useMemo(() => localStorage.getItem('token'), []);
@@ -18,7 +19,7 @@ export const useFetch = () => {
         ...(useToken && token ? { Authorization: `Bearer ${token}` } : {}),
       };
 
-      const response = await fetch(url, {
+      const response = await fetch(`${API_URL}${url}`, {
         method,
         headers: {
           ...defaultHeaders,
