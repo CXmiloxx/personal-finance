@@ -37,12 +37,7 @@ export const publicRoutes = [
 ];
 
 export const protectedRoutes = [
-  {
-    name: 'Gastos y Ingresos',
-    path: '/expenses-income',
-    icon: FaDollarSign,
-    component: expensesIncomePage,
-  },
+
   {
     name: 'Mis Categorías',
     path: '/categories',
