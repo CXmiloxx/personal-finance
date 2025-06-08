@@ -1,5 +1,4 @@
 import {
-  FaDollarSign,
   FaList,
   FaPlusCircle,
   FaTachometerAlt,
@@ -9,7 +8,6 @@ import Login from '$/AuthPage/components/user-auth/Login';
 import ResetPassword from '$/AuthPage/components/user-auth/ResetPassword';
 import NewPassword from '$/AuthPage/components/user-auth/NewPassword';
 import HomePage from '$/HomePage/HomePage';
-import expensesIncomePage from '$/expensesIncomePage/expensesIncomePage';
 import CategoriesPage from '$/categoriesPage/CategoriesPage';
 import CreateCategoriesPage from '$/createCategories/CreateCategoriesPage';
 
