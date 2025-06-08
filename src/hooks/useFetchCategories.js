@@ -1,154 +1,94 @@
 import { useAuth } from '#/AuthContext';
 import { useEffect, useState, useCallback } from 'react';
-
-const API_URL = import.meta.env.VITE_URL_API;
+import { useFetch } from './useFetch';
 
 const useFetchCategories = () => {
   const { user } = useAuth();
   const idUser = user?.id || null;
+  const { get, post, put, del, loading, error } = useFetch();
 
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   const fetchCategories = useCallback(async () => {
     if (!idUser) return;
 
-    setLoading(true);
-    setError(null);
-
     try {
-      const response = await fetch(`${API_URL}/categories/get/${idUser}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const data = await get(`/api/v1/categories`, {
+        params: { userId: idUser },
       });
 
-      if (!response.ok) {
-        throw new Error('Error al obtener las categorías');
+      if (data) {
+        setCategories(data.categories);
       }
-
-      const data = await response.json();
-      setCategories(data);
     } catch (err) {
-      setError(err.message);
       console.error('Error al obtener categorías:', err);
-    } finally {
-      setLoading(false);
     }
-  }, [idUser]);
+  }, [idUser, get]);
 
-  const createCategory = async (categoryName) => {
+  const createCategory = async (name) => {
     if (!idUser) {
-      setError('Usuario no autenticado');
       return false;
     }
 
-    setLoading(true);
-    setError(null);
-
     try {
-      const response = await fetch(`${API_URL}/categories/create`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ idUser, categoryName }),
+      const data = await post(`/api/v1/categories`, {
+        body: { idUser, name },
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Error al crear la categoría');
+      if (data) {
+        await fetchCategories();
+        return true;
       }
-
-      await fetchCategories();
-      return true;
+      return false;
     } catch (err) {
-      setError(err.message);
       console.error('Error al crear categoría:', err);
       return false;
-    } finally {
-      setLoading(false);
     }
   };
 
   const editCategory = async (categoryId, newCategoryName) => {
     if (!idUser) {
-      setError('Usuario no autenticado');
       return false;
     }
 
-    setLoading(true);
-    setError(null);
-
     try {
-      const response = await fetch(`${API_URL}/categories/update`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const data = await put(`/api/v1/categories/${categoryId}`, {
+        body: {
           id: categoryId,
           name: newCategoryName,
           userId: idUser,
-        }),
+        },
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Error al editar la categoría');
+      if (data) {
+        await fetchCategories();
+        return true;
       }
-
-      await fetchCategories();
-      return true;
+      return false;
     } catch (err) {
-      setError(err.message);
       console.error('Error al editar categoría:', err);
       return false;
-    } finally {
-      setLoading(false);
     }
   };
 
   const deleteCategory = async (categoryId) => {
     if (!idUser) {
-      setError('Usuario no autenticado');
       return false;
     }
 
-    setLoading(true);
-    setError(null);
-
     try {
-      const response = await fetch(
-        `${API_URL}/categories/delete/${categoryId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ idUser, categoryId }),
-        },
-      );
+      const data = await del(`/api/v1/categories/${categoryId}`, {
+        body: { idUser, categoryId },
+      });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Error al eliminar la categoría');
-      }
       if (data) {
         await fetchCategories();
         return true;
       }
+      return false;
     } catch (err) {
-      setError(err.message);
       console.error('Error al eliminar categoría:', err);
       return false;
-    } finally {
-      setLoading(false);
     }
   };
 
