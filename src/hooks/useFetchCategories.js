@@ -1,14 +1,18 @@
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '#/AuthContext';
-import { useEffect, useState, useCallback } from 'react';
 import { useFetch } from './useFetch';
+import { CustomAlert } from '@/ui/CustomAlert';
 
-const useFetchCategories = () => {
-  const { user } = useAuth();
-  const idUser = user?.id || null;
-  const { get, post, put, del, loading, error } = useFetch();
-
+export default function useFetchCategories() {
+  const { get, post, put, del, error: fetchError } = useFetch();
   const [categories, setCategories] = useState([]);
+  const [error, setError] = useState(null);
+  const { user } = useAuth();
 
+  // Memoize user ID to prevent unnecessary re-renders
+  const idUser = useMemo(() => user?.id, [user?.id]);
+
+  // Memoize fetchCategories function
   const fetchCategories = useCallback(async () => {
     if (!idUser) return;
 
@@ -17,96 +21,141 @@ const useFetchCategories = () => {
         params: { userId: idUser },
       });
 
-      if (data) {
+      if (data?.categories) {
         setCategories(data.categories);
+        setError(null);
       }
     } catch (err) {
       console.error('Error al obtener categorías:', err);
+      setError(err.message);
+      CustomAlert.error('Error', 'No se pudieron cargar las categorías');
     }
   }, [idUser, get]);
 
-  const createCategory = async (name) => {
-    if (!idUser) {
-      return false;
-    }
+  // Memoize createCategory function
+  const createCategory = useCallback(
+    async (name, description) => {
+      if (!idUser) {
+        CustomAlert.error('Error', 'Usuario no autenticado');
+        return false;
+      }
 
-    try {
-      const data = await post(`/api/v1/categories`, {
-        body: { idUser, name },
-      });
+      try {
+        const data = await post(`/api/v1/categories`, {
+          body: { idUser, name, description },
+        });
 
-      if (data) {
+        if (data?.message) {
+          CustomAlert.success('¡Éxito!', data.message);
+        } else {
+          CustomAlert.success('¡Éxito!', 'Categoría creada correctamente');
+        }
+
         await fetchCategories();
         return true;
+      } catch (err) {
+        const errorMessage = err.message || 'No se pudo crear la categoría';
+        CustomAlert.error('Error', errorMessage);
+        console.error('Error al crear categoría:', err);
+        setError(errorMessage);
+        return false;
       }
-      return false;
-    } catch (err) {
-      console.error('Error al crear categoría:', err);
-      return false;
-    }
-  };
+    },
+    [idUser, post, fetchCategories],
+  );
 
-  const editCategory = async (categoryId, newCategoryName) => {
-    if (!idUser) {
-      return false;
-    }
+  // Memoize editCategory function
+  const editCategory = useCallback(
+    async (categoryId, name, description) => {
+      if (!idUser) {
+        CustomAlert.error('Error', 'Usuario no autenticado');
+        return false;
+      }
 
-    try {
-      const data = await put(`/api/v1/categories/${categoryId}`, {
-        body: {
-          id: categoryId,
-          name: newCategoryName,
-          userId: idUser,
-        },
-      });
+      try {
+        const data = await put(`/api/v1/categories/${categoryId}`, {
+          body: { idUser, name, description },
+        });
 
-      if (data) {
+        if (data?.message) {
+          CustomAlert.success('¡Éxito!', data.message);
+        } else {
+          CustomAlert.success('¡Éxito!', 'Categoría actualizada correctamente');
+        }
+
         await fetchCategories();
         return true;
+      } catch (err) {
+        const errorMessage =
+          err.message || 'No se pudo actualizar la categoría';
+        CustomAlert.error('Error', errorMessage);
+        console.error('Error al actualizar categoría:', err);
+        setError(errorMessage);
+        return false;
       }
-      return false;
-    } catch (err) {
-      console.error('Error al editar categoría:', err);
-      return false;
-    }
-  };
+    },
+    [idUser, put, fetchCategories],
+  );
 
-  const deleteCategory = async (categoryId) => {
-    if (!idUser) {
-      return false;
-    }
+  // Memoize deleteCategory function
+  const deleteCategory = useCallback(
+    async (categoryId) => {
+      if (!idUser) {
+        CustomAlert.error('Error', 'Usuario no autenticado');
+        return false;
+      }
 
-    try {
-      const data = await del(`/api/v1/categories/${categoryId}`, {
-        body: { idUser, categoryId },
-      });
+      try {
+        const data = await del(`/api/v1/categories/${categoryId}`, {
+          body: { idUser, categoryId },
+        });
 
-      if (data) {
+        if (data?.message) {
+          CustomAlert.success('¡Éxito!', data.message);
+        } else {
+          CustomAlert.success('¡Éxito!', 'Categoría eliminada correctamente');
+        }
+
         await fetchCategories();
         return true;
+      } catch (err) {
+        const errorMessage = err.message || 'No se pudo eliminar la categoría';
+        CustomAlert.error('Error', errorMessage);
+        console.error('Error al eliminar categoría:', err);
+        setError(errorMessage);
+        return false;
       }
-      return false;
-    } catch (err) {
-      console.error('Error al eliminar categoría:', err);
-      return false;
-    }
-  };
+    },
+    [idUser, del, fetchCategories],
+  );
 
+  // Fetch categories on mount and when idUser changes
   useEffect(() => {
     if (idUser) {
       fetchCategories();
     }
   }, [idUser, fetchCategories]);
 
-  return {
-    categories,
-    loading,
-    error,
-    fetchCategories,
-    createCategory,
-    editCategory,
-    deleteCategory,
-  };
-};
+  // Memoize the return object to prevent unnecessary re-renders
+  const returnValue = useMemo(
+    () => ({
+      categories,
+      error: error || fetchError,
+      createCategory,
+      editCategory,
+      deleteCategory,
+      fetchCategories,
+    }),
+    [
+      categories,
+      error,
+      fetchError,
+      createCategory,
+      editCategory,
+      deleteCategory,
+      fetchCategories,
+    ],
+  );
 
-export default useFetchCategories;
+  return returnValue;
+}
