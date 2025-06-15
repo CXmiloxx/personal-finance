@@ -31,7 +31,6 @@ export const AuthProvider = ({ children }) => {
         if (data?.user) {
           setUser(data.user);
           setIsAuthenticated(true);
-          localStorage.setItem('isFirstLogin', 'true');
         } else {
           logout();
         }
@@ -58,7 +57,6 @@ export const AuthProvider = ({ children }) => {
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('isFirstLogin', 'true');
       setIsAuthenticated(true);
       setUser(data.user);
 
@@ -83,7 +81,6 @@ export const AuthProvider = ({ children }) => {
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('isFirstLogin', 'true');
       setIsAuthenticated(true);
       setUser(data.user);
 
