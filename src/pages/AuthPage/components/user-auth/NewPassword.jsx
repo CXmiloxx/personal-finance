@@ -26,18 +26,18 @@ export default function NewPassword() {
       number: /\d/.test(pwd),
       special: /[^A-Za-z0-9]/.test(pwd)
     };
-    
+
     setValidationChecks(checks);
-    
+
     const score = Object.values(checks).filter(Boolean).length;
     const strengthPercentage = (score / 4) * 100;
-    
+
     setStrength(strengthPercentage);
     setStrengthLabel(
       strengthPercentage >= 100 ? 'Muy Fuerte' :
-      strengthPercentage >= 75 ? 'Fuerte' :
-      strengthPercentage >= 50 ? 'Media' :
-      strengthPercentage >= 25 ? 'Débil' : 'Muy Débil'
+        strengthPercentage >= 75 ? 'Fuerte' :
+          strengthPercentage >= 50 ? 'Media' :
+            strengthPercentage >= 25 ? 'Débil' : 'Muy Débil'
     );
   };
 
@@ -49,7 +49,7 @@ export default function NewPassword() {
     return 'bg-gradient-to-r from-red-400 to-red-600';
   };
 
-  const isPasswordValid = () => 
+  const isPasswordValid = () =>
     Object.values(validationChecks).every(Boolean);
 
   const handleChange = async (e) => {
