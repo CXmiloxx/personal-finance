@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '#/AuthContext';
-import { Loader2 } from 'lucide-react';
+import { FiUser, FiMail, FiLock, FiUserPlus } from 'react-icons/fi';
 
 export default function SignUp() {
   const { signUpUser } = useAuth();
@@ -43,7 +43,7 @@ export default function SignUp() {
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="bg-white dark:bg-gray-900 rounded-3xl shadow-[0_10px_25px_rgba(0,0,0,0.15)] p-10 w-full max-w-lg border border-gray-200 dark:border-gray-700 backdrop-blur-sm"
+        className="bg-white dark:bg-gray-900 rounded-3xl shadow-[0_10px_25px_rgba(0,0,0,0.15)] p-8 md:p-10 w-full max-w-lg border border-gray-200 dark:border-gray-700 backdrop-blur-sm"
       >
         <motion.h2
           initial={{ opacity: 0, y: -20 }}
@@ -66,7 +66,7 @@ export default function SignUp() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-red-100 text-red-800 px-4 py-2 rounded-md mb-4 text-sm border border-red-300 dark:bg-red-900 dark:text-red-300"
+            className="bg-red-50 text-red-800 px-4 py-2.5 rounded-md mb-4 text-sm border border-red-200 dark:bg-red-900 dark:text-red-300"
           >
             {error}
           </motion.div>
@@ -78,19 +78,19 @@ export default function SignUp() {
               label: 'Nombre de usuario',
               name: 'name',
               type: 'text',
-              icon: '👤',
+              icon: <FiUser className="text-lg" />,
             },
             {
               label: 'Correo electrónico',
               name: 'email',
               type: 'email',
-              icon: '📧',
+              icon: <FiMail className="text-lg" />,
             },
             {
               label: 'Contraseña',
               name: 'password',
               type: 'password',
-              icon: '🔒',
+              icon: <FiLock className="text-lg" />,
             },
           ].map(({ label, name, type, icon }, i) => (
             <motion.div
@@ -103,7 +103,7 @@ export default function SignUp() {
                 {label}
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-2.5 text-gray-400 dark:text-gray-500 text-lg">
+                <span className="absolute left-3 top-2.5 text-gray-400 dark:text-gray-500">
                   {icon}
                 </span>
                 <input
@@ -112,7 +112,7 @@ export default function SignUp() {
                   value={userData[name]}
                   onChange={handleInputChange}
                   required
-                  className="pl-10 pr-4 py-2 w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all shadow-inner hover:shadow-md"
+                  className="pl-10 pr-4 py-2.5 w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all shadow-inner hover:shadow-md"
                   placeholder={`Tu ${label.toLowerCase()}`}
                 />
               </div>
@@ -121,23 +121,29 @@ export default function SignUp() {
 
           <motion.button
             type="submit"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-indigo-500 via-blue-500 to-gray-800 hover:brightness-110 text-white font-bold py-2.5 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-60"
+            className="w-full bg-gradient-to-r from-indigo-500 via-blue-500 to-gray-800 hover:brightness-110 text-white font-bold py-2.5 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <>
-                <Loader2 className="animate-spin w-5 h-5" />
+                <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8z" />
+                </svg>
                 Creando cuenta...
               </>
             ) : (
-              'Registrarse'
+              <>
+                <FiUserPlus className="text-lg" />
+                Registrarse
+              </>
             )}
           </motion.button>
         </form>
 
-        <motion.p
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
@@ -150,7 +156,7 @@ export default function SignUp() {
           >
             Inicia sesión
           </a>
-        </motion.p>
+        </motion.div>
       </motion.div>
     </div>
   );
