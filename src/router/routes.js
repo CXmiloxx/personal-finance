@@ -1,7 +1,8 @@
 import {
-  FaList,
-  FaPlusCircle,
-  FaTachometerAlt,
+  FaWallet,
+  FaChartPie,
+  FaHome,
+  FaPlus,
 } from 'react-icons/fa';
 import SignUp from '$/AuthPage/components/user-auth/SignUp';
 import Login from '$/AuthPage/components/user-auth/Login';
@@ -9,7 +10,8 @@ import ResetPassword from '$/AuthPage/components/user-auth/ResetPassword';
 import NewPassword from '$/AuthPage/components/user-auth/NewPassword';
 import HomePage from '$/HomePage/HomePage';
 import CategoriesPage from '$/categoriesPage/CategoriesPage';
-import CreateCategoriesPage from '$/createCategories/CreateCategoriesPage';
+import CategoryForm from '$/categoriesPage/components/CategoryForm/CategoryForm';
+import TransactionsPage from '$/transactionsPage/TransactionsPage';
 
 export const publicRoutes = [
   {
@@ -35,23 +37,30 @@ export const publicRoutes = [
 ];
 
 export const protectedRoutes = [
-
+  {
+    name: 'Mis Transacciones',
+    icon: FaWallet,
+    path: '/transactions',
+    component: TransactionsPage,
+  },
   {
     name: 'Mis Categorías',
     path: '/categories',
-    icon: FaList,
+    icon: FaChartPie,
     component: CategoriesPage,
-  },
-  {
-    name: 'Crear Categorías',
-    path: '/create-categories',
-    icon: FaPlusCircle,
-    component: CreateCategoriesPage,
   },
   {
     name: 'DashBoard',
     path: '/dashboard',
-    icon: FaTachometerAlt,
+    icon: FaHome,
     component: HomePage,
+  },
+];
+
+export const invisibleRoutes = [
+  {
+    name: 'Crear Categorías',
+    path: '/create-categories',
+    component: CategoryForm,
   },
 ];
