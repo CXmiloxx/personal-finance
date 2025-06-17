@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('isAuthenticated') === 'true';
+      return !!localStorage.getItem('token');
     }
     return false;
   });
@@ -56,9 +56,8 @@ export const AuthProvider = ({ children }) => {
       if (!data?.token) throw new Error('Error al iniciar sesión');
 
       localStorage.setItem('token', data.token);
-      localStorage.setItem('isAuthenticated', 'true');
-      setIsAuthenticated(true);
       setUser(data.user);
+      setIsAuthenticated(true);
 
       return data;
     } catch (error) {
@@ -77,13 +76,9 @@ export const AuthProvider = ({ children }) => {
         body: { name, email, password },
       });
 
-      if (!data?.token) throw new Error('Error al registrarse');
+      if (!data) throw new Error('Error al registrarse');
 
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('isAuthenticated', 'true');
-      setIsAuthenticated(true);
-      setUser(data.user);
-
+      // No establecemos isAuthenticated aquí, ya que el usuario necesita hacer login
       return data;
     } catch (error) {
       setError(error.message);
@@ -127,7 +122,6 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
-    localStorage.removeItem('isAuthenticated');
     setIsAuthenticated(false);
     setUser(null);
   };
@@ -150,7 +144,6 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
