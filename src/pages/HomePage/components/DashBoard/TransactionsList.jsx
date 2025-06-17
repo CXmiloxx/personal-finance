@@ -4,8 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiArrowUpRight, FiArrowDownLeft, FiFilter, FiSearch, FiX } from 'react-icons/fi';
 
 export default function TransactionsList({ transactions = [] }) {
-  console.log(transactions);
-  
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [sortBy, setSortBy] = useState('date');

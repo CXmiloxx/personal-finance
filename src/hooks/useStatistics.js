@@ -30,9 +30,6 @@ export default function useStatistics() {
         params: { userId: idUser },
       });
 
-      console.log(data);
-      
-
       if (data) {
         // Validate and transform data
         const validatedData = {
