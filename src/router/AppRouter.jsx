@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { publicRoutes, protectedRoutes } from './routes';
+import { publicRoutes, protectedRoutes, invisibleRoutes } from './routes';
 import { ProtectedRoute } from './ProtectedRoute';
 
 export default function AppRouter() {
@@ -15,14 +15,24 @@ export default function AppRouter() {
         ))}
 
         <Route element={<ProtectedRoute />}>
-            {protectedRoutes.map((route) => (
-              <Route
-                key={route.path}
-                path={route.path}
-                element={<route.component />}
-              />
-            ))}
-          </Route>
+          {protectedRoutes.map((route) => (
+            <Route
+              key={route.path}
+              path={route.path}
+              element={<route.component />}
+            />
+          ))}
+        </Route>
+
+        <Route element={<ProtectedRoute />}>
+          {invisibleRoutes.map((route) => (
+            <Route
+              key={route.path}
+              path={route.path}
+              element={<route.component />}
+            />
+          ))}
+        </Route>
       </Routes>
     </BrowserRouter>
   );
