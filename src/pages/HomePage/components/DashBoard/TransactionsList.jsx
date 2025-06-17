@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiArrowUpRight, FiArrowDownLeft, FiFilter, FiSearch, FiX } from 'react-icons/fi';
 
-export default function TransactionsList({ transactions }) {
+export default function TransactionsList({ transactions = [] }) {
+  console.log(transactions);
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [sortBy, setSortBy] = useState('date');
@@ -22,8 +25,8 @@ export default function TransactionsList({ transactions }) {
       return 0;
     });
 
-  const getTransactionIcon = (amount) => {
-    return amount > 0 ? (
+  const getTransactionIcon = (movementType) => {
+    return movementType == 'income' ? (
       <FiArrowUpRight className="w-4 h-4 text-green-500" />
     ) : (
       <FiArrowDownLeft className="w-4 h-4 text-red-500" />
@@ -38,7 +41,6 @@ export default function TransactionsList({ transactions }) {
     }).format(date);
   };
 
-
   return (
     <motion.div
       className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg"
@@ -47,7 +49,7 @@ export default function TransactionsList({ transactions }) {
       transition={{ duration: 0.5 }}
     >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Transacciones</h2>
+        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Transacciones Recientes</h2>
         <div className="flex flex-wrap gap-2">
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -132,11 +134,11 @@ export default function TransactionsList({ transactions }) {
                     ? 'bg-green-100 dark:bg-green-900/20'
                     : 'bg-red-100 dark:bg-red-900/20'
                     }`}>
-                    {getTransactionIcon(transaction.amount)}
+                    {getTransactionIcon(transaction.movementType)}
                   </div>
                   <div className="min-w-0">
                     <p className="font-medium text-gray-800 dark:text-gray-100 text-sm truncate">
-                      {transaction.description}
+                      {transaction.description || 'Sin descripción'}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                       {transaction.category} • {formatDate(transaction.date)}
@@ -144,15 +146,12 @@ export default function TransactionsList({ transactions }) {
                   </div>
                 </div>
                 <div className="text-right flex-shrink-0">
-                  <p className={`font-semibold text-sm ${transaction.amount > 0
+                  <p className={`font-semibold text-sm ${transaction.movementType == 'income'
                     ? 'text-green-500'
                     : 'text-red-500'
                     }`}>
-                    {transaction.amount > 0 ? '+' : ''}
+                    {transaction.movementType == 'income' ? '+' : '-'}
                     {transaction.amount.toLocaleString('es-ES', { style: 'currency', currency: 'COP' })}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                    {transaction.account}
                   </p>
                 </div>
               </div>
