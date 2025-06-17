@@ -1,9 +1,4 @@
-import {
-  FaWallet,
-  FaChartPie,
-  FaHome,
-  FaPlus,
-} from 'react-icons/fa';
+import { FaWallet, FaChartPie, FaHome } from 'react-icons/fa';
 import SignUp from '$/AuthPage/components/user-auth/SignUp';
 import Login from '$/AuthPage/components/user-auth/Login';
 import ResetPassword from '$/AuthPage/components/user-auth/ResetPassword';
