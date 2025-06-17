@@ -12,6 +12,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
     "@tailwindcss/vite": "^4.0.15",
+    "avvvatars-react": "^0.4.2",
     "clsx": "^2.1.1",
     "framer-motion": "^10.18.0",
     "lucide-react": "^0.487.0",

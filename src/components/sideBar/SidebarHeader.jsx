@@ -7,6 +7,8 @@ import { useSidebarState } from '!/useSidebar';
 import clsx from 'clsx';
 import logo from '/logo.png';
 import logoDark from '/logo-dark.png';
+import Avvvatars from 'avvvatars-react'
+
 
 const SidebarHeader = () => {
   const { theme } = useTheme();
@@ -95,9 +97,8 @@ const SidebarHeader = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-semibold shadow-md">
-            {nameInitial}
-          </div>
+
+          <Avvvatars value={user.email} style='shape' />
           <div className="flex flex-col pl-4">
             <span className="text-sm font-medium text-gray-800 dark:text-white truncate">
               {user.name || 'Usuario'}
