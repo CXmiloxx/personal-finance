@@ -4,12 +4,12 @@ import { motion } from 'framer-motion';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import { FiTrendingUp, FiAlertCircle } from 'react-icons/fi';
 
-export default function IncomeChart({ data, balance }) {
+export default function IncomeChart({ data = [], balance = 0 }) {
   const totalIncome = balance;
-  const averageIncome = totalIncome / data.length;
-  const currentIncome = data[data.length - 1].amount;
+  const averageIncome = data.length > 0 ? data.reduce((sum, item) => sum + item.amount, 0) / data.length : 0;
+  const currentIncome = data.length > 0 ? data[data.length - 1].amount : 0;
   const trend = currentIncome > averageIncome ? 'up' : 'down';
-  const growthRate = ((currentIncome - data[0].amount) / data[0].amount) * 100;
+  const growthRate = data.length > 1 ? ((currentIncome - data[0].amount) / data[0].amount) * 100 : 0;
 
   return (
     <motion.div
@@ -51,11 +51,11 @@ export default function IncomeChart({ data, balance }) {
               fontSize={12}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(value) => `€${value}`}
+              tickFormatter={(value) => `$${value}`}
               tick={{ fill: '#888' }}
             />
             <Tooltip
-              formatter={(value) => [`€${value.toLocaleString('es-ES')}`, 'Ingreso']}
+              formatter={(value) => [`$${value.toLocaleString('es-ES')}`, 'Ingreso']}
               labelFormatter={(label) => `Mes: ${label}`}
               contentStyle={{
                 backgroundColor: 'rgba(22, 27, 34, 0.9)',
@@ -99,7 +99,7 @@ export default function IncomeChart({ data, balance }) {
         >
           <p className="text-sm text-gray-500 dark:text-gray-400">Media mensual</p>
           <p className="text-xl font-semibold text-gray-800 dark:text-white">
-            {averageIncome.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+            {averageIncome.toLocaleString('es-ES', { style: 'currency', currency: 'COP' })}
           </p>
         </motion.div>
       </div>
@@ -125,7 +125,7 @@ export default function IncomeChart({ data, balance }) {
         >
           <p className="text-sm text-gray-500 dark:text-gray-400">Último ingreso</p>
           <p className="text-xl font-semibold text-gray-800 dark:text-white">
-            {currentIncome.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+            {currentIncome.toLocaleString('es-ES', { style: 'currency', currency: 'COP' })}
           </p>
         </motion.div>
       </div>
