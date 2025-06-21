@@ -2,14 +2,35 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
-import { FiTrendingUp, FiAlertCircle } from 'react-icons/fi';
+import { FiTrendingUp, FiTrendingDown, FiMinus, FiAlertCircle } from 'react-icons/fi';
 
 export default function IncomeChart({ data = [], balance = 0 }) {
+
+  // Asegurarnos de que data sea un array
+  const validData = Array.isArray(data) ? data : [data];
+
   const totalIncome = balance;
-  const averageIncome = data.length > 0 ? data.reduce((sum, item) => sum + item.amount, 0) / data.length : 0;
-  const currentIncome = data.length > 0 ? data[data.length - 1].amount : 0;
-  const trend = currentIncome > averageIncome ? 'up' : 'down';
-  const growthRate = data.length > 1 ? ((currentIncome - data[0].amount) / data[0].amount) * 100 : 0;
+  const averageIncome = validData.length > 0
+    ? validData.reduce((sum, item) => sum + (item.amount || 0), 0) / validData.length
+    : 0;
+  const currentIncome = validData.length > 0
+    ? validData[validData.length - 1].amount || 0
+    : 0;
+
+  // Calcular la tendencia solo si hay datos
+  const trend = validData.length > 0
+    ? currentIncome > averageIncome
+      ? 'up'
+      : currentIncome < averageIncome
+        ? 'down'
+        : 'stable'
+    : 'stable';
+
+  // Calcular la tasa de crecimiento solo si hay más de un dato
+  const growthRate = validData.length > 1
+    ? ((currentIncome - validData[0].amount) / validData[0].amount) * 100
+    : 0;
+
 
   return (
     <motion.div
@@ -21,16 +42,28 @@ export default function IncomeChart({ data = [], balance = 0 }) {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Ingresos Mensuales</h2>
         <div className="flex items-center gap-2">
-          <span className={`text-sm font-medium ${trend === 'up' ? 'text-green-500' : 'text-red-500'}`}>
-            {trend === 'up' ? '↑' : '↓'} {Math.abs(((currentIncome - averageIncome) / averageIncome) * 100).toFixed(1)}%
+          <span className={`text-sm font-medium ${trend === 'up' ? 'text-green-500' :
+            trend === 'down' ? 'text-red-500' :
+              'text-blue-500'
+            }`}>
+            {trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→'} {
+              trend === 'stable' ? '0' :
+                Math.abs(((currentIncome - averageIncome) / averageIncome) * 100).toFixed(1)
+            }%
           </span>
-          <FiTrendingUp className={`w-5 h-5 ${trend === 'up' ? 'text-green-500' : 'text-red-500'}`} />
+          {trend === 'up' ? (
+            <FiTrendingUp className="w-5 h-5 text-green-500" />
+          ) : trend === 'down' ? (
+            <FiTrendingDown className="w-5 h-5 text-red-500" />
+          ) : (
+            <FiMinus className="w-5 h-5 text-blue-500" />
+          )}
         </div>
       </div>
 
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data}>
+          <AreaChart data={validData}>
             <defs>
               <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
