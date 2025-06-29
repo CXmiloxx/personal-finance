@@ -1,7 +1,7 @@
 import { useAuth } from '#/AuthContext';
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { EyeIcon, EyeOffIcon, LockIcon, ArrowLeftIcon, CheckCircle2Icon, AlertCircleIcon } from 'lucide-react';
 
 export default function NewPassword() {
@@ -16,7 +16,8 @@ export default function NewPassword() {
     special: false
   });
   const { newPassword, loading, error } = useAuth();
-  const { token } = useParams();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
   const navigate = useNavigate();
 
   const validateStrength = (pwd) => {
