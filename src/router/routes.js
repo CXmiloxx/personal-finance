@@ -26,7 +26,7 @@ export const publicRoutes = [
   },
   {
     name: 'Nueva Contraseña',
-    path: '/new-password/:token',
+    path: '/new-password',
     component: NewPassword,
   },
 ];
