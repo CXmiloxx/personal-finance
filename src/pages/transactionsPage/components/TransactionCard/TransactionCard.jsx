@@ -40,10 +40,10 @@ export default function TransactionCard({ transaction, onEdit, onDelete, viewMod
             )}
           </div>
           <div>
-            <h3 className="text-sm text-gray-500 dark:text-gray-400">
+            <h3 className="text-lg text-gray-500 dark:text-gray-400">
               {transaction.Category?.name || 'Sin categoría'}
             </h3>
-            <p className="text-lg font-semibold text-gray-800 dark:text-white">
+            <p className="text-sm font-semibold text-gray-800 dark:text-white">
               {transaction.description || 'Sin descripción'}
             </p>
           </div>
