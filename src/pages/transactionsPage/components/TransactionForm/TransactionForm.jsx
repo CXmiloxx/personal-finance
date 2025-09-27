@@ -1,44 +1,78 @@
 /* eslint-disable no-unused-vars */
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { AlertTriangle } from 'lucide-react';
-import useFetchCategories from '!/useFetchCategories';
-
-const transactionSchema = z.object({
-  categoryId: z.string().min(1, 'La categoría es requerida'),
-  amount: z.number().min(0.01, 'El monto debe ser mayor a 0'),
-  movementType: z.enum(['income', 'expense'], {
-    required_error: 'El tipo de movimiento es requerido',
-  }),
-  frequency: z.enum(['daily', 'weekly', 'biweekly', 'monthly', 'yearly']),
-  description: z.string().optional(),
-});
+import { useState, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiMic, FiMicOff, FiSend, FiX, FiTrash2 } from 'react-icons/fi';
 
 export default function TransactionForm({ onSubmit, initialData, onCancel }) {
+  const [isRecording, setIsRecording] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { categories } = useFetchCategories();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(transactionSchema),
-    defaultValues: {
-      categoryId: initialData?.categoryId || '',
-      amount: initialData?.amount || '',
-      movementType: initialData?.movementType || 'expense',
-      frequency: initialData?.frequency || 'monthly',
-      description: initialData?.description || '',
-    },
-  });
+  const [transcript, setTranscript] = useState(initialData?.message || '');
+  const recognitionRef = useRef(null);
 
-  const handleFormSubmit = async (formData) => {
+  // Verificar si el navegador soporta reconocimiento de voz
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  const startRecording = () => {
+    if (!SpeechRecognition) {
+      alert('Tu navegador no soporta reconocimiento de voz.');
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'es-ES';
+    recognition.interimResults = true;
+    recognition.continuous = true;
+
+    recognition.onresult = (event) => {
+      let interimTranscript = '';
+      let finalTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        const transcriptPiece = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcriptPiece;
+        } else {
+          interimTranscript += transcriptPiece;
+        }
+      }
+      setTranscript(finalTranscript + interimTranscript);
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      setIsRecording(false);
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsRecording(true);
+  };
+
+  const stopRecording = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
+    }
+    setIsRecording(false);
+  };
+
+  const handleClear = () => {
+    setTranscript('');
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      recognitionRef.current = null;
+    }
+    setIsRecording(false);
+  };
+
+  const handleSend = async () => {
+    if (!transcript.trim()) return;
+    setIsSubmitting(true);
     try {
-      setIsSubmitting(true);
-      await onSubmit(formData);
+      await onSubmit({ message: transcript.trim() });
       onCancel();
     } catch (error) {
       console.error('Error al guardar la transacción:', error);
@@ -48,153 +82,107 @@ export default function TransactionForm({ onSubmit, initialData, onCancel }) {
   };
 
   return (
-    <motion.form
-      onSubmit={handleSubmit(handleFormSubmit)}
-      className="space-y-6"
+    <motion.div
+      className="flex flex-col h-[400px] max-h-[70vh] bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 rounded-2xl shadow-lg p-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Left Column */}
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Categoría
-            </label>
-            <select
-              {...register('categoryId')}
-              className={`w-full px-4 py-2 rounded-lg border ${errors.categoryId
-                ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500'
-                } focus:outline-none focus:ring-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white`}
+      <div className="flex-1 flex flex-col justify-center items-center mb-6">
+        <AnimatePresence>
+          {isRecording && (
+            <motion.div
+              key="recording"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="flex flex-col items-center mb-2"
             >
-              <option value="">Selecciona una categoría</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-            {errors.categoryId && (
-              <p className="mt-1 text-sm text-red-600 flex items-center">
-                <AlertTriangle className="w-4 h-4 mr-1" />
-                {errors.categoryId.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Monto
-            </label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                $
-              </span>
-              <input
-                type="number"
-                step="0.01"
-                {...register('amount', { valueAsNumber: true })}
-                className={`w-full pl-8 pr-4 py-2 rounded-lg border ${errors.amount
-                  ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500'
-                  } focus:outline-none focus:ring-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white`}
-                placeholder="0.00"
-              />
-            </div>
-            {errors.amount && (
-              <p className="mt-1 text-sm text-red-600 flex items-center">
-                <AlertTriangle className="w-4 h-4 mr-1" />
-                {errors.amount.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Tipo de Movimiento
-            </label>
-            <select
-              {...register('movementType')}
-              className={`w-full px-4 py-2 rounded-lg border ${errors.movementType
-                ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500'
-                } focus:outline-none focus:ring-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white`}
-            >
-              <option value="expense">Gasto</option>
-              <option value="income">Ingreso</option>
-            </select>
-            {errors.movementType && (
-              <p className="mt-1 text-sm text-red-600 flex items-center">
-                <AlertTriangle className="w-4 h-4 mr-1" />
-                {errors.movementType.message}
-              </p>
-            )}
-          </div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="animate-pulse text-red-500">
+                  <FiMic className="w-7 h-7" />
+                </span>
+                <span className="text-blue-700 dark:text-blue-200 font-semibold">
+                  Escuchando...
+                </span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <div className="w-full">
+          <textarea
+            className="w-full min-h-[120px] max-h-[200px] resize-none rounded-xl border border-blue-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 text-lg text-gray-900 dark:text-gray-100 shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            placeholder="Habla o escribe aquí tu transacción..."
+            value={transcript}
+            onChange={e => setTranscript(e.target.value)}
+            disabled={isSubmitting}
+            spellCheck={false}
+            autoFocus
+          />
         </div>
-
-        {/* Right Column */}
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Frecuencia
-            </label>
-            <select
-              {...register('frequency')}
-              className={`w-full px-4 py-2 rounded-lg border ${errors.frequency
-                ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500'
-                } focus:outline-none focus:ring-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white`}
+        <div className="flex w-full justify-end mt-2">
+          {transcript && (
+            <motion.button
+              type="button"
+              onClick={handleClear}
+              whileHover={{ scale: 1.1, rotate: 10 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-1 px-3 py-1.5 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-200 rounded-lg text-sm font-medium hover:bg-red-200 dark:hover:bg-red-800 transition shadow-sm"
+              title="Limpiar texto"
             >
-              <option value="monthly">Mensual</option>
-              <option value="weekly">Semanal</option>
-              <option value="biweekly">Quincenal</option>
-              <option value="daily">Diario</option>
-              <option value="yearly">Anual</option>
-            </select>
-            {errors.frequency && (
-              <p className="mt-1 text-sm text-red-600 flex items-center">
-                <AlertTriangle className="w-4 h-4 mr-1" />
-                {errors.frequency.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Descripción (opcional)
-            </label>
-            <textarea
-              {...register('description')}
-              rows="4"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-              placeholder="Describe la transacción..."
-            />
-          </div>
+              <FiTrash2 className="w-4 h-4" />
+              Limpiar
+            </motion.button>
+          )}
         </div>
       </div>
-
-      <div className="flex gap-3 justify-end pt-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="flex items-center gap-3 border-t border-blue-100 dark:border-gray-700 pt-4">
+        <motion.button
+          type="button"
+          onClick={isRecording ? stopRecording : startRecording}
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.97 }}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors shadow-sm
+            ${isRecording
+              ? 'bg-red-600 text-white hover:bg-red-700'
+              : 'bg-green-600 text-white hover:bg-green-700'
+            }`}
+          disabled={isSubmitting}
+        >
+          {isRecording ? (
+            <>
+              <FiMicOff className="w-5 h-5" />
+              Detener
+            </>
+          ) : (
+            <>
+              <FiMic className="w-5 h-5" />
+              Grabar
+            </>
+          )}
+        </motion.button>
+        <motion.button
+          type="button"
+          onClick={handleSend}
+          disabled={isSubmitting || !transcript.trim()}
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.97 }}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <FiSend className="w-5 h-5" />
+          {isSubmitting ? 'Enviando...' : 'Enviar'}
+        </motion.button>
         <motion.button
           type="button"
           onClick={onCancel}
-          whileHover={{ scale: 1.02 }}
+          whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.98 }}
-          className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+          className="ml-auto flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg font-semibold transition-colors shadow-sm"
         >
+          <FiX className="w-5 h-5" />
           Cancelar
         </motion.button>
-        <motion.button
-          type="submit"
-          disabled={isSubmitting}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isSubmitting ? 'Guardando...' : 'Guardar'}
-        </motion.button>
       </div>
-    </motion.form>
+    </motion.div>
   );
-} 
+}
