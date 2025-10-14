@@ -9,9 +9,10 @@ import useFetchCategories from '!/useFetchCategories';
 import Modal from '@/ui/Modal';
 import TransactionCard from './components/TransactionCard/TransactionCard';
 import TransactionForm from './components/TransactionForm/TransactionForm';
+import TransactionFilter from './components/TransactionFilter';
 
 export default function TransactionsPage() {
-  const { transactions, deleteTransaction, editTransaction, createTransaction, error } = useTransactions();
+  const { transactions, deleteTransaction, editTransaction, createTransaction,getFilteredByDate, getFilteredCategories, fetchTransactions, loading } = useTransactions();
   const { categories } = useFetchCategories();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
@@ -120,6 +121,8 @@ export default function TransactionsPage() {
                 Administra tus ingresos y gastos
               </p>
             </div>
+
+            <TransactionFilter getFilteredByDate={getFilteredByDate} getFilteredCategories={getFilteredCategories} fetchTransactions={fetchTransactions} loading={loading}/>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 bg-white dark:bg-gray-800 p-1 rounded-lg shadow-sm">
                 <button
